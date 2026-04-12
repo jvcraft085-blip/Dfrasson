@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D Frasson — O Melhor do Campo Pra Você</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,600;1,700&family=Nunito:wght@300;400;500;600&family=Nunito+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="img/icon.png">
+    <style>
+        :root {
+            --verde: #1a4d2e;
+            --verde-medio: #2d6a4f;
+            --verde-claro: #52b788;
+            --vermelho: #c1121f;
+            --creme: #faf7f0;
+            --creme-escuro: #f0ebe0;
+            --texto: #1c1c1c;
+            --texto-suave: #5a5a4a;
+            --branco: #ffffff;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--creme); color: var(--texto); overflow-x: hidden; }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 18px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(250, 247, 240, 0.97);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+            transition: box-shadow 0.4s ease;
+        }
+
+        .logo-img { height: 52px; width: auto; object-fit: contain; }
+
+        nav ul { list-style: none; display: flex; gap: 36px; align-items: center; }
+
+        nav ul li a {
+            text-decoration: none; color: var(--verde);
+            font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+            transition: color 0.3s; position: relative;
+        }
+
+        nav ul li a::after {
+            content: ''; position: absolute; bottom: -3px; left: 0;
+            width: 0; height: 1.5px; background: var(--vermelho); transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover { color: var(--vermelho); }
+        nav ul li a:hover::after { width: 100%; }
+
+        .contact-header {
+            font-size: 13px; color: var(--verde); font-weight: 500;
+            background: rgba(26, 77, 46, 0.08); padding: 8px 16px; border-radius: 100px;
+        }
+
+        .burger-menu {
+            display: none; flex-direction: column; gap: 6px;
+            background: none; border: none; cursor: pointer; padding: 4px; z-index: 300;
+        }
+
+        .burger-menu span { display: block; width: 26px; height: 2px; background: var(--verde); border-radius: 2px; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+        /* ===== MENU FULLSCREEN ===== */
+        .nav-overlay {
+            position: fixed; inset: 0; z-index: 250;
+            background: var(--verde);
+            display: flex; flex-direction: column;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            overflow: hidden;
+        }
+
+        /* Padrão decorativo de fundo */
+        .nav-overlay::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.04) 1px, transparent 0);
+            background-size: 36px 36px;
+            pointer-events: none;
+        }
+
+        /* Blob decorativo */
+        .nav-overlay::after {
+            content: '';
+            position: absolute;
+            bottom: -120px; right: -120px;
+            width: 500px; height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(82,183,136,0.15) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .nav-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Topo do overlay: logo + fechar */
+        .nav-overlay-top {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 32px;
+            flex-shrink: 0;
+            position: relative; z-index: 1;
+        }
+
+        .nav-overlay-logo { height: 44px; width: auto; object-fit: contain; opacity: 0.9; }
+
+        .nav-close {
+            background: none; border: none; cursor: pointer;
+            width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            transition: background 0.2s;
+        }
+        .nav-close:hover { background: rgba(255,255,255,0.16); }
+        .nav-close svg { width: 20px; height: 20px; stroke: white; stroke-width: 2; }
+
+        /* Links centrais */
+        .nav-overlay-links {
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            padding: 0 32px;
+            position: relative; z-index: 1;
+            gap: 0;
+        }
+
+        .nav-overlay-item {
+            display: flex; align-items: center; gap: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 18px 0;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .nav-overlay.open .nav-overlay-item {
+            opacity: 1; transform: translateY(0);
+        }
+
+        /* Delays em cascata */
+        .nav-overlay.open .nav-overlay-item:nth-child(1) { transition-delay: 0.05s; }
+        .nav-overlay.open .nav-overlay-item:nth-child(2) { transition-delay: 0.10s; }
+        .nav-overlay.open .nav-overlay-item:nth-child(3) { transition-delay: 0.15s; }
+        .nav-overlay.open .nav-overlay-item:nth-child(4) { transition-delay: 0.20s; }
+        .nav-overlay.open .nav-overlay-item:nth-child(5) { transition-delay: 0.25s; }
+        .nav-overlay.open .nav-overlay-item:nth-child(6) { transition-delay: 0.30s; }
+        .nav-overlay.open .nav-overlay-item:nth-child(7) { transition-delay: 0.35s; }
+
+        .nav-overlay-num {
+            font-family: 'Nunito', sans-serif;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.3);
+            min-width: 28px;
+        }
+
+        .nav-overlay-label {
+            font-family: 'Lora', serif;
+            font-size: clamp(26px, 6vw, 38px);
+            font-weight: 700; color: white;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .nav-overlay-item:hover .nav-overlay-label { color: var(--verde-claro); }
+
+        .nav-overlay-arrow {
+            margin-left: auto;
+            font-size: 20px; color: rgba(255,255,255,0.2);
+            transition: color 0.2s, transform 0.2s;
+        }
+        .nav-overlay-item:hover .nav-overlay-arrow {
+            color: var(--verde-claro);
+            transform: translateX(6px);
+        }
+
+        /* Rodapé do overlay */
+        .nav-overlay-footer {
+            padding: 24px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+            position: relative; z-index: 1;
+            flex-wrap: wrap; gap: 12px;
+        }
+
+        .nav-overlay-contact {
+            font-size: 13px; color: rgba(255,255,255,0.5);
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .nav-overlay-contact a {
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            transition: color 0.2s;
+        }
+        .nav-overlay-contact a:hover { color: var(--verde-claro); }
+
+        /* ===== HERO ===== */
+        .hero { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; position: relative; overflow: hidden; }
+
+        .hero-left {
+            background: var(--verde);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 120px 64px 80px; position: relative; overflow: hidden;
+        }
+
+        .hero-left-bg {
+            position: absolute; inset: 0;
+            background-image: url('img/icon.png');
+            background-repeat: no-repeat; background-position: center; background-size: 70%;
+            filter: blur(40px) opacity(0.12); transform: scale(1.15); z-index: 0;
+        }
+
+        .hero-left > *:not(.hero-left-bg) { position: relative; z-index: 1; }
+
+        .hero-left::before {
+            content: ''; position: absolute; top: -80px; right: -80px;
+            width: 400px; height: 400px; border-radius: 50%; z-index: 0;
+            background: radial-gradient(circle, rgba(82,183,136,0.25) 0%, transparent 70%);
+        }
+
+        .hero-left::after {
+            content: ''; position: absolute; bottom: -60px; left: -60px;
+            width: 300px; height: 300px; border-radius: 50%; z-index: 0;
+            background: radial-gradient(circle, rgba(193,18,31,0.15) 0%, transparent 70%);
+        }
+
+        .hero-eyebrow {
+            font-family: 'Nunito', sans-serif; font-size: 11px; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--verde-claro); margin-bottom: 24px;
+            opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards;
+        }
+
+        .hero-title {
+            font-family: 'Lora', serif; font-size: clamp(48px, 5.5vw, 82px);
+            line-height: 1.05; color: var(--branco); font-weight: 900; margin-bottom: 32px;
+            opacity: 0; animation: fadeUp 0.9s ease 0.4s forwards;
+        }
+
+        .hero-title em { font-style: italic; color: var(--verde-claro); }
+
+        .hero-desc {
+            font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.7;
+            max-width: 400px; margin-bottom: 48px; font-weight: 300;
+            opacity: 0; animation: fadeUp 0.9s ease 0.6s forwards;
+        }
+
+        .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.9s ease 0.8s forwards; }
+
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--vermelho); color: white; text-decoration: none;
+            padding: 16px 32px; border-radius: 4px; font-size: 14px; font-weight: 500;
+            letter-spacing: 0.03em; transition: background 0.25s, transform 0.25s;
+        }
+        .btn-primary:hover { background: #a10d18; transform: translateY(-2px); }
+
+        .btn-outline {
+            display: inline-flex; align-items: center; gap: 10px;
+            border: 1.5px solid rgba(255,255,255,0.35); color: white; text-decoration: none;
+            padding: 16px 32px; border-radius: 4px; font-size: 14px; font-weight: 400;
+            transition: border-color 0.25s, background 0.25s;
+        }
+        .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.08); }
+
+        .hero-right {
+            background: var(--creme-escuro); position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .hero-right::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(circle at 2px 2px, rgba(26,77,46,0.07) 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+
+        .hero-badge {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; z-index: 2; opacity: 0; animation: fadeIn 1s ease 1s forwards;
+        }
+
+        .hero-badge-circle {
+            width: 340px; height: 340px; border-radius: 50%;
+            border: 1.5px solid rgba(26,77,46,0.12);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 12px; position: relative;
+        }
+
+        .hero-badge-circle::before {
+            content: ''; position: absolute; inset: 24px;
+            border-radius: 50%; border: 1.5px solid rgba(26,77,46,0.08);
+        }
+
+        .hero-badge-year { font-family: 'Nunito', sans-serif; font-size: 11px; color: var(--verde-medio); letter-spacing: 0.15em; text-transform: uppercase; }
+        .hero-badge-num { font-family: 'Lora', serif; font-size: 96px; font-weight: 900; color: var(--verde); line-height: 1; }
+        .hero-badge-label { font-size: 13px; color: var(--texto-suave); max-width: 160px; text-align: center; line-height: 1.5; }
+
+        .hero-floating-tag {
+            position: absolute; background: var(--branco); border-radius: 8px;
+            padding: 14px 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); font-size: 13px; white-space: nowrap;
+        }
+
+        .hero-floating-tag .tag-label {
+            font-family: 'Nunito', sans-serif; font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.12em; color: var(--texto-suave); margin-bottom: 4px;
+        }
+
+        .hero-floating-tag .tag-value { font-weight: 600; color: var(--verde); font-size: 14px; }
+
+        .tag-1 { bottom: 22%; right: 10%; animation: float1 4s ease-in-out infinite; }
+        .tag-2 { top: 22%; left: 8%; animation: float2 5s ease-in-out infinite; }
+
+        .hero-tags-mobile { display: none; }
+
+        /* ===== DIFERENCIAIS ===== */
+        .section { padding: 120px 64px; max-width: 1400px; margin: 0 auto; }
+
+        .section-label {
+            font-family: 'Nunito', sans-serif; font-size: 11px; letter-spacing: 0.16em;
+            text-transform: uppercase; color: var(--vermelho); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .section-label::before { content: ''; width: 32px; height: 1px; background: var(--vermelho); }
+
+        .section-title {
+            font-family: 'Lora', serif; font-size: clamp(36px, 4vw, 60px); font-weight: 700;
+            color: var(--verde); line-height: 1.1; margin-bottom: 64px; max-width: 600px;
+        }
+        .section-title em { font-style: italic; color: var(--vermelho); }
+
+        .diferenciais-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+
+        .dif-card { background: var(--branco); padding: 48px 40px; position: relative; overflow: hidden; transition: transform 0.3s ease; }
+        .dif-card:hover { transform: translateY(-4px); z-index: 2; }
+        .dif-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--verde); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+        .dif-card:hover::before { transform: scaleX(1); }
+        .dif-number { font-family: 'Lora', serif; font-size: 80px; font-weight: 900; color: var(--creme-escuro); line-height: 1; margin-bottom: 20px; transition: color 0.3s; }
+        .dif-card:hover .dif-number { color: rgba(26,77,46,0.1); }
+        .dif-icon { font-size: 32px; margin-bottom: 16px; }
+        .dif-titulo { font-size: 18px; font-weight: 600; color: var(--verde); margin-bottom: 12px; }
+        .dif-texto { font-size: 14px; color: var(--texto-suave); line-height: 1.7; font-weight: 300; }
+
+        /* ===== SOBRE ===== */
+        .sobre-wrapper { background: var(--verde); padding: 120px 64px; }
+        .sobre-inner { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center; }
+
+        .sobre-label {
+            font-family: 'Nunito', sans-serif; font-size: 11px; letter-spacing: 0.16em;
+            text-transform: uppercase; color: var(--verde-claro); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sobre-label::before { content: ''; width: 32px; height: 1px; background: var(--verde-claro); }
+
+        .sobre-titulo { font-family: 'Lora', serif; font-size: clamp(36px, 3.5vw, 54px); font-weight: 700; color: var(--branco); line-height: 1.15; margin-bottom: 32px; }
+        .sobre-titulo em { font-style: italic; color: var(--verde-claro); }
+        .sobre-texto { font-size: 15px; color: rgba(255,255,255,0.72); line-height: 1.8; font-weight: 300; margin-bottom: 24px; }
+
+        .sobre-crn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 4px; padding: 12px 20px; font-family: 'Nunito', sans-serif;
+            font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 0.08em; margin-top: 16px;
+        }
+
+        /* ===== LICITAÇÕES ===== */
+        .licitacoes-wrapper { background: var(--creme-escuro); padding: 120px 64px; }
+        .licitacoes-inner { max-width: 1400px; margin: 0 auto; }
+        .licitacoes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
+
+        .lic-card { background: var(--branco); border-radius: 8px; padding: 40px 36px; border: 1.5px solid transparent; transition: border-color 0.3s, box-shadow 0.3s; }
+        .lic-card:hover { border-color: var(--verde-claro); box-shadow: 0 16px 48px rgba(26,77,46,0.08); }
+        .lic-num { font-family: 'Lora', serif; font-size: 14px; font-weight: 700; color: var(--verde-claro); margin-bottom: 20px; }
+        .lic-titulo { font-size: 20px; font-weight: 600; color: var(--verde); margin-bottom: 12px; }
+        .lic-texto { font-size: 14px; color: var(--texto-suave); line-height: 1.7; font-weight: 300; }
+
+        /* ===== CLIENTES ===== */
+        .clientes-wrapper { padding: 120px 64px; max-width: 1400px; margin: 0 auto; }
+        .clientes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
+
+        .cliente-card {
+            background: var(--branco); border-radius: 8px; padding: 48px 36px; text-align: center;
+            border: 1.5px solid transparent; transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .cliente-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--verde), var(--verde-claro)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+        .cliente-card:hover::before { transform: scaleX(1); }
+        .cliente-card:hover { border-color: rgba(26,77,46,0.15); box-shadow: 0 12px 40px rgba(26,77,46,0.08); transform: translateY(-4px); }
+
+        .cliente-brasao { width: 100px; height: 100px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
+        .cliente-brasao img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.12)); transition: transform 0.3s ease; }
+        .cliente-card:hover .cliente-brasao img { transform: scale(1.08); }
+        .brasao-fallback { font-size: 48px; display: flex; align-items: center; justify-content: center; }
+        .cliente-nome { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--verde); margin-bottom: 8px; }
+        .cliente-estado { font-size: 13px; color: var(--texto-suave); font-weight: 300; font-family: 'Nunito', sans-serif; letter-spacing: 0.08em; }
+
+        /* ===== CONTATO ===== */
+        .contato-wrapper { background: var(--verde); padding: 120px 64px; }
+
+        .contato-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 80px; align-items: start;
+        }
+
+        .contato-label {
+            font-family: 'Nunito', sans-serif; font-size: 11px;
+            letter-spacing: 0.16em; text-transform: uppercase;
+            color: var(--verde-claro); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .contato-label::before { content: ''; width: 32px; height: 1px; background: var(--verde-claro); }
+
+        .contato-titulo {
+            font-family: 'Lora', serif;
+            font-size: clamp(32px, 3.5vw, 50px); font-weight: 700;
+            color: white; line-height: 1.15; margin-bottom: 12px;
+        }
+        .contato-titulo em { font-style: italic; color: var(--verde-claro); }
+
+        .contato-subtitulo {
+            font-size: 15px; color: rgba(255,255,255,0.55);
+            font-weight: 300; line-height: 1.6; margin-bottom: 48px;
+        }
+
+        .contato-itens { display: flex; flex-direction: column; gap: 28px; }
+        .contato-item { display: flex; align-items: flex-start; gap: 18px; }
+
+        .contato-icone {
+            width: 46px; height: 46px; border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0; transition: background 0.2s;
+        }
+        .contato-item:hover .contato-icone { background: rgba(255,255,255,0.18); }
+
+        .contato-info-label {
+            font-family: 'Nunito', sans-serif; font-size: 10px;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--verde-claro); margin-bottom: 5px;
+        }
+        .contato-info-valor { font-size: 15px; color: rgba(255,255,255,0.85); font-weight: 400; line-height: 1.55; }
+        .contato-info-valor a { color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.2s; }
+        .contato-info-valor a:hover { color: var(--verde-claro); }
+
+        .contato-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 48px 44px; display: flex; flex-direction: column; gap: 32px;
+        }
+        .contato-card-titulo { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: white; margin-bottom: 8px; }
+        .contato-card-texto { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.75; font-weight: 300; }
+        .contato-horario { display: flex; flex-direction: column; gap: 10px; }
+        .contato-horario-item { display: flex; align-items: center; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.75); }
+        .contato-horario-item::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--verde-claro); flex-shrink: 0; }
+
+        /* ===== ALERTA ===== */
+        .alerta-wrapper { background: #fffbeb; border-top: 3px solid #f59e0b; border-bottom: 3px solid #f59e0b; padding: 60px 64px; }
+        .alerta-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+        .alerta-inner h2 { font-family: 'Lora', serif; font-size: 28px; font-weight: 700; color: #92400e; margin-bottom: 16px; }
+        .alerta-inner p { font-size: 15px; color: #78350f; line-height: 1.7; font-weight: 300; margin-bottom: 16px; }
+        .alerta-contatos { display: inline-flex; gap: 32px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+        .alerta-contatos span { font-family: 'Nunito', sans-serif; font-size: 14px; color: #92400e; font-weight: 500; }
+
+        /* ===== FOOTER ===== */
+        footer { background: var(--texto); padding: 48px 64px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .footer-brand { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; color: white; }
+        .footer-brand span { font-weight: 300; font-size: 14px; color: rgba(255,255,255,0.4); font-family: 'Nunito Sans', sans-serif; display: block; margin-top: 2px; }
+        .footer-copy { font-size: 13px; color: rgba(255,255,255,0.35); font-weight: 300; }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes float1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes float2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+
+        /* ===== MVV ===== */
+        .mvv-wrapper { background: var(--creme-escuro); padding: 120px 64px; }
+        .mvv-inner { max-width: 1200px; margin: 0 auto; }
+        .mvv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 56px; }
+
+        .mvv-card { background: var(--branco); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 24px rgba(26,77,46,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .mvv-card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(26,77,46,0.12); }
+
+        .mvv-card-img { width: 100%; aspect-ratio: 16/10; overflow: hidden; position: relative; flex-shrink: 0; }
+        .mvv-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+        .mvv-card:hover .mvv-card-img img { transform: scale(1.05); }
+
+        .mvv-card-img-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: relative; }
+        .mvv-card-img-placeholder::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; }
+        .mvv-card-img-placeholder .ph-icon { font-size: 44px; position: relative; z-index: 1; }
+        .mvv-card-img-placeholder .ph-label { font-family: 'Nunito', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.65); position: relative; z-index: 1; }
+
+        .mvv-card-body { padding: 32px 36px 40px; display: flex; flex-direction: column; flex: 1; }
+        .mvv-card-tag { font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 10px; }
+        .mvv-card-titulo { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--verde); margin-bottom: 16px; line-height: 1.2; }
+        .mvv-card-texto { font-size: 14px; color: var(--texto-suave); line-height: 1.85; font-weight: 400; }
+
+        .mvv-card.destaque { background: var(--verde); }
+        .mvv-card.destaque .mvv-card-tag { color: var(--verde-claro); }
+        .mvv-card.destaque .mvv-card-titulo { color: white; }
+        .mvv-card.destaque .mvv-card-texto { color: rgba(255,255,255,0.75); }
+
+        .mvv-valores-lista { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 2px; }
+        .mvv-valores-lista li { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: var(--texto-suave); line-height: 1.55; font-weight: 400; }
+        .mvv-valores-lista li .val-icon { width: 22px; height: 22px; border-radius: 50%; background: rgba(26,77,46,0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 11px; }
+
+        /* ===== CARROSSEL ===== */
+        .carrossel { position: relative; width: 100%; border-radius: 12px; overflow: hidden; }
+        .carrossel-track { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .carrossel-slide { min-width: 100%; aspect-ratio: 4/3; position: relative; overflow: hidden; flex-shrink: 0; }
+
+        .carrossel-slide img {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; display: block; transition: transform 0.6s ease;
+        }
+        .carrossel-slide:hover img { transform: scale(1.04); }
+
+        .carrossel-slide .slide-bg-fallback {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+        }
+        .slide-bg-fallback .slide-icon { font-size: 64px; opacity: 0.8; }
+
+        .slide-caption {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 28px 28px 24px;
+            background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%);
+            z-index: 2;
+        }
+        .slide-caption strong { font-size: 16px; color: white; display: block; margin-bottom: 4px; font-weight: 600; }
+        .slide-caption p { font-size: 13px; color: rgba(255,255,255,0.82); font-weight: 300; }
+
+        .carrossel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display: flex; justify-content: space-between; padding: 0 12px; pointer-events: none; z-index: 10; }
+        .carrossel-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.35); backdrop-filter: blur(8px); color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; pointer-events: all; transition: background 0.2s; line-height: 1; }
+        .carrossel-btn:hover { background: rgba(255,255,255,0.32); }
+        .carrossel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+        .carrossel-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: background 0.3s, transform 0.3s; border: none; }
+        .carrossel-dot.active { background: var(--verde-claro); transform: scale(1.3); }
+
+        /* Scroll reveal */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            header { padding: 16px 28px; }
+
+            nav { display: none; }
+
+            .burger-menu { display: flex; z-index: 300; }
+            .burger-menu.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .burger-menu.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+            .burger-menu.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+            .contact-header { display: none; }
+
+            .hero { grid-template-columns: 1fr; min-height: auto; }
+            .hero-left { padding: 100px 28px 48px; }
+            .tag-1, .tag-2 { display: none; }
+            .hero-right { min-height: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 40px 24px 48px; }
+            .hero-badge { position: static; transform: none; }
+            .hero-tags-mobile { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; }
+            .hero-tag-static { background: var(--branco); border-radius: 8px; padding: 14px 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); width: 100%; }
+            .hero-tag-static .tag-label { font-family: 'Nunito', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--texto-suave); margin-bottom: 4px; }
+            .hero-tag-static .tag-value { font-weight: 600; color: var(--verde); font-size: 13px; }
+
+            .section, .licitacoes-wrapper, .clientes-wrapper, .alerta-wrapper { padding: 80px 28px; }
+            .sobre-wrapper { padding: 80px 28px; }
+            .sobre-inner { grid-template-columns: 1fr; gap: 48px; }
+            .contato-wrapper { padding: 80px 28px; }
+            .contato-inner { grid-template-columns: 1fr; gap: 48px; }
+            .diferenciais-grid, .licitacoes-grid, .clientes-grid { grid-template-columns: 1fr; }
+            .mvv-grid { grid-template-columns: 1fr; gap: 20px; }
+            .mvv-wrapper { padding: 80px 28px; }
+            footer { padding: 40px 28px; flex-direction: column; align-items: flex-start; }
+            .hero-badge-circle { width: 220px; height: 220px; }
+            .hero-badge-num { font-size: 60px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <div class="logo">
+            <img src="img/logo_dfrasson.PNG" alt="D Frasson" class="logo-img">
+        </div>
+        <nav id="nav">
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#licitacoes">Licitações</a></li>
+                <li><a href="#clientes">Clientes</a></li>
+                <li><a href="produtos.html">Produtos</a></li>
+                <li><a href="box.html">Box</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+        </nav>
+        <div class="contact-header">📞 (11) 4462-6685</div>
+        <button class="burger-menu" id="burger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- MENU FULLSCREEN MOBILE -->
+    <div class="nav-overlay" id="navOverlay">
+        <div class="nav-overlay-top">
+            <img src="img/logo_dfrasson.PNG" alt="D Frasson" class="nav-overlay-logo">
+            <button class="nav-close" id="navClose" aria-label="Fechar menu">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="nav-overlay-links">
+            <a href="#home"        class="nav-overlay-item"><span class="nav-overlay-num">01</span><span class="nav-overlay-label">Home</span><span class="nav-overlay-arrow">→</span></a>
+            <a href="#sobre"       class="nav-overlay-item"><span class="nav-overlay-num">02</span><span class="nav-overlay-label">Sobre</span><span class="nav-overlay-arrow">→</span></a>
+            <a href="#licitacoes"  class="nav-overlay-item"><span class="nav-overlay-num">03</span><span class="nav-overlay-label">Licitações</span><span class="nav-overlay-arrow">→</span></a>
+            <a href="#clientes"    class="nav-overlay-item"><span class="nav-overlay-num">04</span><span class="nav-overlay-label">Clientes</span><span class="nav-overlay-arrow">→</span></a>
+            <a href="produtos.html" class="nav-overlay-item"><span class="nav-overlay-num">05</span><span class="nav-overlay-label">Produtos</span><span class="nav-overlay-arrow">→</span></a>
+            <a href="box.html"     class="nav-overlay-item"><span class="nav-overlay-num">06</span><span class="nav-overlay-label">Box</span><span class="nav-overlay-arrow">→</span></a>
+            <a href="#contato"     class="nav-overlay-item"><span class="nav-overlay-num">07</span><span class="nav-overlay-label">Contato</span><span class="nav-overlay-arrow">→</span></a>
+        </div>
+
+        <div class="nav-overlay-footer">
+            <span class="nav-overlay-contact">📞 <a href="tel:+551144626685">(11) 4462-6685</a></span>
+            <span class="nav-overlay-contact">📍 Santo André — SP</span>
+        </div>
+    </div>
+
+    <section class="hero" id="home">
+        <div class="hero-left">
+            <div class="hero-left-bg"></div>
+            <p class="hero-eyebrow">Desde 2005 — Atacado Hortifrutigranjeiro</p>
+            <h1 class="hero-title">O melhor<br>do campo <em>pra<br>você</em></h1>
+            <p class="hero-desc">Fornecimento de hortifrútis frescos para alimentação escolar em municípios da Grande São Paulo, através de licitações públicas.</p>
+            <div class="hero-cta">
+                <a href="#contato" class="btn-primary">Fale conosco</a>
+                <a href="#sobre" class="btn-outline">Conheça a empresa</a>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="hero-badge">
+                <div class="hero-badge-circle">
+                    <p class="hero-badge-year">Anos de mercado</p>
+                    <p class="hero-badge-num">21+</p>
+                    <p class="hero-badge-label">Entregando qualidade desde 2005</p>
+                </div>
+            </div>
+            <div class="hero-floating-tag tag-1">
+                <p class="tag-label">Municípios atendidos</p>
+                <p class="tag-value">São Caetano · São Bernardo · Santo André</p>
+            </div>
+            <div class="hero-floating-tag tag-2">
+                <p class="tag-label">Especialidade</p>
+                <p class="tag-value"><img src="img/icon.png" alt="" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:6px;">Alimentação Escolar</p>
+            </div>
+            <div class="hero-tags-mobile">
+                <div class="hero-tag-static">
+                    <p class="tag-label">Especialidade</p>
+                    <p class="tag-value"><img src="img/icon.png" alt="" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:6px;">Alimentação Escolar</p>
+                </div>
+                <div class="hero-tag-static">
+                    <p class="tag-label">Municípios atendidos</p>
+                    <p class="tag-value">São Caetano · São Bernardo · Santo André</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section" id="sobre">
+        <p class="section-label reveal">Por que D Frasson</p>
+        <h2 class="section-title reveal">Qualidade que<br>chega <em>na escola</em></h2>
+        <div class="diferenciais-grid">
+            <div class="dif-card reveal"><p class="dif-number">01</p><p class="dif-icon">🥗</p><h3 class="dif-titulo">Produtos Frescos</h3><p class="dif-texto">Hortifrútis selecionados diretamente de produtores rurais, garantindo frescor máximo e qualidade superior na mesa dos estudantes.</p></div>
+            <div class="dif-card reveal" style="transition-delay:0.1s"><p class="dif-number">02</p><p class="dif-icon">🚚</p><h3 class="dif-titulo">Frota Refrigerada</h3><p class="dif-texto">Veículos equipados com baús frigoríficos próprios garantem temperatura ideal durante todo o transporte, preservando cada alimento.</p></div>
+            <div class="dif-card reveal" style="transition-delay:0.2s"><p class="dif-number">03</p><p class="dif-icon">📋</p><h3 class="dif-titulo">Experiência em Licitações</h3><p class="dif-texto">Desde 2005 participando de pregões eletrônicos e registros de preço, com documentação fiscal sempre regularizada e em dia.</p></div>
+        </div>
+    </div>
+
+    <div class="sobre-wrapper" id="empresa">
+        <div class="sobre-inner">
+            <div>
+                <p class="sobre-label reveal">Nossa história</p>
+                <h2 class="sobre-titulo reveal">Uma empresa feita<br>de <em>compromisso</em></h2>
+                <p class="sobre-texto reveal">A D Frasson Comércio de Frutas é um atacado hortifrutigranjeiro especializado em licitações municipais. Atuamos no fornecimento de alimentos para a alimentação escolar, garantindo que crianças das redes públicas recebam o melhor da produção rural brasileira.</p>
+                <p class="sobre-texto reveal">Nosso centro de armazenagem conta com câmaras frigoríficas de última geração, e contamos com nutricionista própria para fiscalizar todo o processo — do recebimento à entrega nas unidades escolares.</p>
+                <p class="sobre-texto reveal">Todos os alimentos são procedentes de estabelecimentos registrados nos órgãos competentes, e os hortifrutigranjeiros são acondicionados em caixas plásticas retornáveis, assegurando higiene e sustentabilidade.</p>
+            </div>
+
+            <div class="reveal" style="position:relative;">
+                <div class="carrossel" id="carrossel">
+                    <div class="carrossel-track" id="carrosselTrack">
+
+                        <!-- Slide 1 — img/escola1.png -->
+                        <div class="carrossel-slide">
+                            <img src="img/hort.png" alt="Hortifrútis frescos"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="slide-bg-fallback" style="display:none; background:linear-gradient(135deg,#1a4d2e,#2d6a4f,#52b788)">
+                                <span class="slide-icon">🥦</span>
+                            </div>
+                            <div class="slide-caption">
+                                <strong>Hortifrútis Frescos</strong>
+                                <p>Selecionados diretamente no CEAGESP, com frescor garantido</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 — img/escola2.png -->
+                        <div class="carrossel-slide">
+                            <img src="img/cam.png" alt="Frota refrigerada"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="slide-bg-fallback" style="display:none; background:linear-gradient(135deg,#2d3a1e,#4a5c2a,#7a9a3a)">
+                                <span class="slide-icon">🚚</span>
+                            </div>
+                            <div class="slide-caption">
+                                <strong>Frota Refrigerada Própria</strong>
+                                <p>Baús frigoríficos garantem temperatura ideal até a escola</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 — img/escola4.png -->
+                        <div class="carrossel-slide">
+                            <img src="img/escola4.png" alt="Qualidade para os estudantes"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="slide-bg-fallback" style="display:none; background:linear-gradient(135deg,#3d1a1a,#6a2d2d,#b85252)">
+                                <span class="slide-icon">🍎</span>
+                            </div>
+                            <div class="slide-caption">
+                                <strong>Qualidade para os Estudantes</strong>
+                                <p>Alimentos registrados nos órgãos competentes, do campo à merenda</p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="carrossel-nav">
+                        <button class="carrossel-btn" id="btnPrev">&#8592;</button>
+                        <button class="carrossel-btn" id="btnNext">&#8594;</button>
+                    </div>
+                </div>
+                <div class="carrossel-dots" id="carrosselDots">
+                    <button class="carrossel-dot active" data-index="0"></button>
+                    <button class="carrossel-dot" data-index="1"></button>
+                    <button class="carrossel-dot" data-index="2"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="licitacoes-wrapper" id="licitacoes">
+        <div class="licitacoes-inner">
+            <p class="section-label reveal">Atuação</p>
+            <h2 class="section-title reveal">Especialistas em<br>licitações <em>públicas</em></h2>
+            <div class="licitacoes-grid">
+                <div class="lic-card reveal"><p class="lic-num">01 —</p><h3 class="lic-titulo">Pregão Eletrônico</h3><p class="lic-texto">Ampla experiência em participação e vencimento de pregões eletrônicos para fornecimento de alimentos às redes municipais de ensino.</p></div>
+                <div class="lic-card reveal" style="transition-delay:0.1s"><p class="lic-num">02 —</p><h3 class="lic-titulo">Registro de Preços</h3><p class="lic-texto">Fornecimento contínuo e estável ao longo do ano letivo, garantindo abastecimento regular e previsível para as escolas.</p></div>
+                <div class="lic-card reveal" style="transition-delay:0.2s"><p class="lic-num">03 —</p><h3 class="lic-titulo">Regularidade Fiscal</h3><p class="lic-texto">Documentação fiscal, sanitária e trabalhista sempre em dia, facilitando habilitação e execução dos contratos públicos.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mvv-wrapper" id="mvv">
+        <div class="mvv-inner">
+            <p class="section-label reveal">Quem somos</p>
+            <h2 class="section-title reveal">Missão, Visão<br>e <em>Valores</em></h2>
+            <div class="mvv-grid">
+                <div class="mvv-card reveal">
+                    <div class="mvv-card-img"><img src="img/escola1.png" alt="Crianças na escola" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="mvv-card-img-placeholder" style="display:none;background:linear-gradient(145deg,#1a4d2e,#52b788)"><span class="ph-icon">🏫</span><span class="ph-label">Escola</span></div></div>
+                    <div class="mvv-card-body"><p class="mvv-card-tag">01 — Missão</p><h3 class="mvv-card-titulo">Por que existimos</h3><p class="mvv-card-texto">Fornecer alimentos frescos, seguros e nutritivos para a alimentação escolar dos municípios da Grande São Paulo, garantindo que cada criança receba o melhor da produção rural brasileira — com pontualidade, higiene e compromisso inabalável com a qualidade.</p></div>
+                </div>
+                <div class="mvv-card destaque reveal" style="transition-delay:0.12s">
+                    <div class="mvv-card-img"><img src="img/escola2.png" alt="Crianças comendo na escola" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="mvv-card-img-placeholder" style="display:none;background:linear-gradient(145deg,#0d2e1a,#1a4d2e)"><span class="ph-icon">🍽️</span><span class="ph-label">Merenda</span></div></div>
+                    <div class="mvv-card-body"><p class="mvv-card-tag">02 — Visão</p><h3 class="mvv-card-titulo">Para onde vamos</h3><p class="mvv-card-texto">Ser reconhecida como a distribuidora hortifrutigranjeira mais confiável do ABC Paulista, expandindo nossa atuação para novos municípios e consolidando parcerias duradouras — contribuindo para um Brasil com estudantes mais saudáveis e bem alimentados.</p></div>
+                </div>
+                <div class="mvv-card reveal" style="transition-delay:0.24s">
+                    <div class="mvv-card-img"><img src="img/escola3.png" alt="Ambiente escolar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="mvv-card-img-placeholder" style="display:none;background:linear-gradient(145deg,#2d4a1e,#52b788)"><span class="ph-icon">🌱</span><span class="ph-label">Valores</span></div></div>
+                    <div class="mvv-card-body"><p class="mvv-card-tag">03 — Valores</p><h3 class="mvv-card-titulo">Como agimos</h3><ul class="mvv-valores-lista"><li><span class="val-icon">✓</span>Qualidade acima de tudo, do campo à escola</li><li><span class="val-icon">✓</span>Compromisso com prazos e contratos públicos</li><li><span class="val-icon">✓</span>Transparência com clientes e fornecedores</li><li><span class="val-icon">✓</span>Responsabilidade com a nutrição infantil</li><li><span class="val-icon">✓</span>Sustentabilidade no transporte dos alimentos</li><li><span class="val-icon">✓</span>Respeito às normas sanitárias e fiscais</li></ul></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="clientes-wrapper" id="clientes">
+        <p class="section-label reveal">Onde estamos</p>
+        <h2 class="section-title reveal">Municípios que<br><em>confiam</em> em nós</h2>
+        <div class="clientes-grid">
+            <div class="cliente-card reveal">
+                <div class="cliente-brasao"><img src="img/Brasao_SaoCaetano_SaoPaulo_Brasil.svg.png" alt="Brasão de São Caetano do Sul" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="brasao-fallback" style="display:none;">🏙️</div></div>
+                <h3 class="cliente-nome">São Caetano do Sul</h3><p class="cliente-estado">SP — Grande São Paulo</p>
+            </div>
+            <div class="cliente-card reveal" style="transition-delay:0.1s">
+                <div class="cliente-brasao"><img src="img/sao_bernardo.png" alt="Brasão de São Bernardo do Campo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="brasao-fallback" style="display:none;">🌆</div></div>
+                <h3 class="cliente-nome">São Bernardo do Campo</h3><p class="cliente-estado">SP — Grande São Paulo</p>
+            </div>
+            <div class="cliente-card reveal" style="transition-delay:0.2s">
+                <div class="cliente-brasao"><img src="img/Design sem nome (8).png" alt="Brasão de Santo André" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="brasao-fallback" style="display:none;">🏛️</div></div>
+                <h3 class="cliente-nome">Santo André</h3><p class="cliente-estado">SP — Grande São Paulo</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="contato-wrapper" id="contato">
+        <div class="contato-inner">
+            <div>
+                <p class="contato-label reveal">Fale conosco</p>
+                <h2 class="contato-titulo reveal">Entre em <em>contato</em></h2>
+                <p class="contato-subtitulo reveal">Solicite um orçamento ou tire suas dúvidas sobre nossos produtos e serviços de alimentação escolar.</p>
+                <div class="contato-itens">
+                    <div class="contato-item reveal">
+                        <div class="contato-icone">📍</div>
+                        <div>
+                            <p class="contato-info-label">Endereço</p>
+                            <p class="contato-info-valor">Rua Berenice, 58 — Vila Metalúrgica<br>Santo André — SP</p>
+                        </div>
+                    </div>
+                    <div class="contato-item reveal" style="transition-delay:0.08s">
+                        <div class="contato-icone">📞</div>
+                        <div>
+                            <p class="contato-info-label">Telefone</p>
+                            <p class="contato-info-valor"><a href="tel:+551144626685">(11) 4462-6685</a></p>
+                        </div>
+                    </div>
+                    <div class="contato-item reveal" style="transition-delay:0.16s">
+                        <div class="contato-icone">✉️</div>
+                        <div>
+                            <p class="contato-info-label">E-mail</p>
+                            <p class="contato-info-valor">merendaescolar@dfrasson.com.br</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contato-card reveal" style="transition-delay:0.1s">
+                <div>
+                    <p class="contato-card-titulo">Horário de Atendimento</p>
+                    <p class="contato-card-texto">Nossa equipe está disponível nos seguintes horários para atender pedidos, orçamentos e dúvidas sobre licitações e fornecimento.</p>
+                </div>
+                <div class="contato-horario">
+                    <div class="contato-horario-item">Segunda a Sexta: 7h às 17h</div>
+                    <div class="contato-horario-item">Sábado e Domingo: Fechado</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alerta-wrapper">
+        <div class="alerta-inner">
+            <h2>⚠️ Alerta de Golpes</h2>
+            <p>A <strong>D Frasson Comércio de Frutas</strong> não realiza cobranças, pedidos de pagamento ou compras em nome da empresa fora de seus canais oficiais. Golpistas podem usar indevidamente nosso nome para solicitar pagamentos ou enviar boletos falsos.</p>
+            <p>Toda comunicação e negociação oficial é feita exclusivamente pelos canais abaixo. Caso identifique atividade suspeita, entre em contato imediatamente.</p>
+            <div class="alerta-contatos">
+                <span>📍 Santo André — SP</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-brand">D Frasson<span>O melhor do campo pra você</span></div>
+        <p class="footer-copy">© 2026 D Frasson Comércio de Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Menu fullscreen mobile
+        const burger = document.getElementById('burger');
+        const navOverlay = document.getElementById('navOverlay');
+        const navClose = document.getElementById('navClose');
+
+        function openMenu() {
+            navOverlay.classList.add('open');
+            burger.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            navOverlay.classList.remove('open');
+            burger.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        burger.addEventListener('click', openMenu);
+        navClose.addEventListener('click', closeMenu);
+
+        // Fechar ao clicar em link
+        document.querySelectorAll('.nav-overlay-item').forEach(a => {
+            a.addEventListener('click', closeMenu);
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            });
+        });
+
+        const track = document.getElementById('carrosselTrack');
+        const dots = document.querySelectorAll('.carrossel-dot');
+        let current = 0;
+        const total = 3;
+
+        function goTo(index) {
+            current = (index + total) % total;
+            track.style.transform = `translateX(-${current * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        }
+
+        document.getElementById('btnPrev').addEventListener('click', () => goTo(current - 1));
+        document.getElementById('btnNext').addEventListener('click', () => goTo(current + 1));
+        dots.forEach(dot => dot.addEventListener('click', () => goTo(+dot.dataset.index)));
+        setInterval(() => goTo(current + 1), 4000);
+    </script>
+</body>
+</html>
